@@ -1,0 +1,87 @@
+{
+  "_comment": "This file should be filled renamed to local.settings.json. If hosted on azure, the function config should be set to represent all settings in this file.",
+
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet"
+  },
+
+  "DnsServersSettings": {
+    "DnsServers": [
+      {
+        "ServerName": "northeu"
+      },
+      {
+        "ServerName": "centraleu"
+      },
+      {
+        "ServerName": "eastus"
+      },
+      {
+        "ServerName": "westus"
+      },
+      {
+        "ServerName": "eastau"
+      },
+      {
+        "ServerName": "eastas"
+      }
+    ]
+  },
+
+  "DnsServerApiSettings": {
+    "DnsServerApis": [
+      {
+        "ServerName": "northeu",
+        "ApiKey": "<ApiKey>"
+      },
+      {
+        "ServerName": "centraleu",
+        "ApiKey": "<ApiKey>"
+      },
+      {
+        "ServerName": "eastus",
+        "ApiKey": "<ApiKey>"
+      },
+      {
+        "ServerName": "westus",
+        "ApiKey": "<ApiKey>"
+      },
+      {
+        "ServerName": "eastau",
+        "ApiKey": "<ApiKey>"
+      },
+      {
+        "ServerName": "eastas",
+        "ApiKey": "<ApiKey>"
+      }
+    ]
+  },
+
+  "DnsServerStatisticsStore": {
+    "ConnectionString": "UseDevelopmentStorage=true",
+    "TableName": "DnsServerStatistics"
+  },
+
+  "PiDnsWebApiSettings": {
+    "Url": "<url>",
+    "ApiKey": "<ApiKey>"
+  },
+
+  "Serilog": {
+    "Using": [ "Serilog.Sinks.Console", "Serilog.Sinks.ApplicationInsights" ],
+    "MinimumLevel": "Debug",
+    "WriteTo": [
+      {
+        "Name": "Console",
+        "Args": {
+          "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] TransactionId:{TransactionId} SourceContext:{SourceContext} {Message:lj}{NewLine}{Exception}"
+        }
+      }
+    ],
+    "Properties": {
+      "Application": "Pi.Dns.Function.Triggers"
+    }
+  }
+}

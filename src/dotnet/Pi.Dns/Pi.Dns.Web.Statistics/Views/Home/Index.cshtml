@@ -1,0 +1,263 @@
+﻿@model HomeViewModel
+@{
+    var XLabels = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ExtendedStatistics?.Select(x => x.CreatedDate).ToList());
+    var NumberOfDnsRequests = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ExtendedStatistics?.Select(x => x.TotalNumQueries).ToList());
+    var NumberOfAdsBlocked = Newtonsoft.Json.JsonConvert.SerializeObject(Model.ExtendedStatistics?.Select(x => x.NumAnswerNXDOMAIN).ToList());
+    var QueryTypeDimensions = Newtonsoft.Json.JsonConvert.SerializeObject(Model.QueryTypeDimensions);
+    var QueryTypeValues = Newtonsoft.Json.JsonConvert.SerializeObject(Model.QueryTypeValues);
+    var AnswerTypeDimensions = Newtonsoft.Json.JsonConvert.SerializeObject(Model.AnswerTypeDimensions);
+    var AnswerTypeValues = Newtonsoft.Json.JsonConvert.SerializeObject(Model.AnswerTypeValues);
+    var SumDnsRequests = Model.ExtendedStatistics?.Sum(x => x.TotalNumQueries).ToString("N0");
+    var SumAdsBlocked = Model.ExtendedStatistics?.Sum(x => x.NumAnswerNXDOMAIN).ToString("N0");
+    ViewData["Title"] = $"{Model.ExtendedStatistics?.FirstOrDefault()?.ServerName.ToUpperInvariant() ?? "Detailed Server"} Statistics | pi-dns.com";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+    @if (Model.ServerName != null)
+    {
+    <div class="box-body">
+        <center>
+            @foreach (var displayableDnsServer in Model.DisplayableDnsServerSettings.DisplayableDnsServers)
+            {
+                <b><a style="font-size:16px;" href="?server=@displayableDnsServer.ServerName">@displayableDnsServer.DisplayName</a>&nbsp;&nbsp;|&nbsp;&nbsp;</b>
+            }
+            <!--
+            <b><a style="font-size:16px;" href="?server=all">All</a></b>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <b><a style="font-size:16px;" href="?server=centraleu">Central Europe</a></b>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <b><a style="font-size:16px;" href="?server=northeu">North Europe</a></b>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <b><a style="font-size:16px;" href="?server=westus">West USA</a></b>&nbsp;&nbsp;|&nbsp;&nbsp;
+            <b><a style="font-size:16px;" href="?server=eastus">East USA</a></b>
+            -->
+            <br />
+            <br />
+            <b>(Last 24h)</b>
+        </center>
+        <br />
+        <div class="chart-container">
+            <center>Number of DNS requests: <b>@SumDnsRequests</b> | Number of ADS blocked: <b>@SumAdsBlocked</b></center>
+            <br />
+            <canvas id="chart" style="width:100%; height:500px;"></canvas>
+        </div>
+        <hr />
+        <center>
+            <div class="chart-container" style="width:45%; max-width:800px; display:inline-block;">
+                <center><h3>Query Type Statistics</h3></center>
+                <canvas id="chart2" style="width:100%; height:400px"></canvas>
+            </div>
+            <div class="chart-container" style="width:45%; max-width:800px; display:inline-block;">
+                <center><h3>Answer Type Statistics</h3></center>
+                <canvas id="chart3" style="width:100%; height:400px"></canvas>
+            </div>
+        </center>
+        
+        <br />
+        <br />
+        <center>
+            <b>No personal or user identifiable data is logged or saved on any of our DNS servers!</b>
+            <br />
+            <b><a href="https://pi-dns.com/privacy-policy/">Privacy Policy</a></b>
+        </center>
+    </div>
+    }
+    else
+    {
+        <div class="box-body">
+            <center>
+                <h1>Select Server</h1>
+                @foreach (var displayableDnsServer in Model.DisplayableDnsServerSettings.DisplayableDnsServers)
+                {
+                    <b><a style="font-size:24px;" href="?server=@displayableDnsServer.ServerName">@displayableDnsServer.DisplayName</a>&nbsp;&nbsp;|&nbsp;&nbsp;</b>
+                }
+                <!--
+                <b><a style="font-size:24px;" href="?server=all">All</a></b>&nbsp;&nbsp;|&nbsp;&nbsp;
+                <b><a style="font-size:24px;" href="?server=centraleu">Central Europe</a></b>&nbsp;&nbsp;|&nbsp;&nbsp;
+                <b><a style="font-size:24px;" href="?server=northeu">North Europe</a></b>&nbsp;&nbsp;|&nbsp;&nbsp;
+                <b><a style="font-size:24px;" href="?server=westus">West USA</a></b>&nbsp;&nbsp;|&nbsp;&nbsp;
+                <b><a style="font-size:24px;" href="?server=eastus">East USA</a></b>
+                -->
+            </center>
+        </div>
+    }
+    </body>
+</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+@if (Model.ServerName != null)
+{
+    <script type="text/javascript">
+
+    $(function () {
+        var ctx = document.getElementById("chart").getContext('2d');
+        var data = {
+            labels: @Html.Raw(XLabels),
+            datasets: [
+                {
+                    label: "Number of DNS requests",
+                    backgroundColor: 'rgba(101, 76, 228, 0.2)',
+                    borderColor: 'rgba(101, 76, 228, 1)',
+                    borderWidth: 1,
+                    data: @Html.Raw(NumberOfDnsRequests)
+                },
+                {
+                    label: "Number of ADS blocked",
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1,
+                    data: @Html.Raw(NumberOfAdsBlocked)
+                }
+            ]
+        };
+
+        var options = {
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        min: 0,
+                        beginAtZero: true
+                    },
+                    gridLines: {
+                        display: true,
+                        color: "rgba(126,100,255,0.2)"
+                    }
+                }],
+                xAxes: [{
+                    ticks: {
+                        min: 0,
+                        beginAtZero: true
+                    },
+                    gridLines: {
+                        display: false
+                    }
+                }]
+            }
+        };
+
+       var numberDnsStatistics = new  Chart(ctx, {
+            options: options,
+            data: data,
+            type:'line'
+       });
+    });
+
+
+
+    $(function () {
+        var ctx = document.getElementById("chart2").getContext('2d');
+        var data = {
+            labels: @Html.Raw(QueryTypeDimensions),
+            datasets: [{
+                label: "Query Type Chart",
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 0, 0)',
+                    'rgba(0, 255, 0)',
+                    'rgba(0, 0, 255)',
+                    'rgba(192, 192, 192)',
+                    'rgba(255, 255, 0)',
+                    'rgba(255, 0, 255)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 0, 0)',
+                    'rgba(0, 255, 0)',
+                    'rgba(0, 0, 255)',
+                    'rgba(192, 192, 192)',
+                    'rgba(255, 255, 0)',
+                    'rgba(255, 0, 255)'
+                ],
+                borderWidth: 1,
+                data: @Html.Raw(QueryTypeValues)
+            }]
+        };
+
+        var options = {
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [],
+                xAxes: []
+            }
+        };
+
+       var queryTypeChart = new  Chart(ctx, {
+            options: options,
+            data: data,
+            type:'pie'
+       });
+    });
+
+
+    $(function () {
+        var ctx = document.getElementById("chart3").getContext('2d');
+        var data = {
+            labels: @Html.Raw(AnswerTypeDimensions),
+            datasets: [{
+                label: "Answer Type Chart",
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 0, 0)',
+                    'rgba(0, 255, 0)',
+                    'rgba(0, 0, 255)',
+                    'rgba(192, 192, 192)',
+                    'rgba(255, 255, 0)',
+                    'rgba(255, 0, 255)'
+                ],
+                borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 0, 0)',
+                    'rgba(0, 255, 0)',
+                    'rgba(0, 0, 255)',
+                    'rgba(192, 192, 192)',
+                    'rgba(255, 255, 0)',
+                    'rgba(255, 0, 255)'
+                ],
+                borderWidth: 1,
+                data: @Html.Raw(AnswerTypeValues)
+            }]
+        };
+
+        var options = {
+            maintainAspectRatio: false,
+            scales: {
+                yAxes: [],
+                xAxes: []
+            }
+        };
+
+       var queryTypeChart = new  Chart(ctx, {
+            options: options,
+            data: data,
+            type:'pie'
+       });
+    });
+    </script>
+
+}
