@@ -44,3 +44,7 @@ vanilla.futurecdn.net
 graph.facebook.com
 facebook.com
 www.facebook.com
+kuaidi100.com
+www.kuaidi100.com
+cdn.kuaidi100.com
+m.kuaidi100.com
