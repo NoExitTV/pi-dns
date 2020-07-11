@@ -14,9 +14,9 @@ using Willezone.Azure.WebJobs.Extensions.DependencyInjection;
 
 namespace Pi.Dns.Function.Notifications.Functions
 {
-    public static class HetrixToolsWebhook
+    public static class UptimeRobotWebhook
     {
-        public const string FunctionName = nameof(HetrixToolsWebhook);
+        public const string FunctionName = nameof(UptimeRobotWebhook);
 
         [FunctionName(FunctionName)]
         public static async Task<IActionResult> Run(
@@ -27,20 +27,19 @@ namespace Pi.Dns.Function.Notifications.Functions
 
             try
             {
-                // Get request body and deserialize to hetrix tools class
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
                 if (string.IsNullOrEmpty(requestBody))
                     throw new ArgumentNullException("Request body can not be null or empty");
 
-                var hetrixToolsAlert = JsonConvert.DeserializeObject<HetrixToolsAlert>(requestBody);
+                var uptimeRobotAlert = JsonConvert.DeserializeObject<UptimeRobotAlert>(requestBody);
 
                 // Send alert to all known alert clients
                 foreach (var alertClient in alertClients)
                 {
-                    logger.Information("Sending HetrixToolsAlert to {Integration} client", alertClient.Integration);
-                    if (!(await alertClient.TrySendHetrixToolsAlert(hetrixToolsAlert)))
-                        logger.Warning("AlertClient {Client} returned false when sending hetrix tools alert {@Alert}, indicating a failure", alertClient.Integration, hetrixToolsAlert);
+                    logger.Information("Sending UptimeRobotAlert to {Integration} client", alertClient.Integration);
+                    if (!(await alertClient.TrySendUptimeRobotAlert(uptimeRobotAlert)))
+                        logger.Warning("AlertClient {Client} returned false when sending UptimeRobotAlert {@Alert}, indicating a failure", alertClient.Integration, uptimeRobotAlert);
                 }
 
                 return new OkObjectResult("Ok");

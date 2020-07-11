@@ -32,11 +32,9 @@ namespace Pi.Dns.Function.Notifications.AlertClients
         }
 
         /// <summary>
-        /// Send pidns query statistics to Telegram
+        /// Send HetrixTools uptime notification to Telegram
         /// </summary>
-        /// <param name="totalDnsRequests"></param>
-        /// <param name="totalAdsBlocked"></param>
-        /// <param name="printableTimeSpan"></param>
+        /// <param name="hetrixToolsAlert"></param>
         /// <returns></returns>
         public async Task<bool> TrySendHetrixToolsAlert(HetrixToolsAlert hetrixToolsAlert)
         {
@@ -77,6 +75,13 @@ namespace Pi.Dns.Function.Notifications.AlertClients
             }
         }
 
+        /// <summary>
+        /// Send pidns query statistics to Telegram
+        /// </summary>
+        /// <param name="totalDnsRequests"></param>
+        /// <param name="totalAdsBlocked"></param>
+        /// <param name="printableTimeSpan"></param>
+        /// <returns></returns>
         public async Task<bool> TrySendPiDnsStatistics(long totalDnsRequests, long totalAdsBlocked, string printableTimeSpan)
         {
             try
@@ -89,6 +94,43 @@ namespace Pi.Dns.Function.Notifications.AlertClients
             catch (Exception e)
             {
                 _logger.Error(e, "Got an exception while sending pidns statistics alert to Telegram");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Send UptimeRobot uptime notification to Telegram
+        /// </summary>
+        /// <param name="uptimeRobotAlert"></param>
+        /// <returns></returns>
+        public async Task<bool> TrySendUptimeRobotAlert(UptimeRobotAlert uptimeRobotAlert)
+        {
+            try
+            {
+                var message = "";
+
+                // Down
+                if (uptimeRobotAlert.AlertType == UptimeRobotAlert.AlertTypes.Down)
+                {
+                    message = $"<b>{uptimeRobotAlert.FriendlyName}</b> has gone <strong>{uptimeRobotAlert.AlertTypeFriendlyName.ToUpper()}</strong>\n";
+                }
+                // Up
+                else if (uptimeRobotAlert.AlertType == UptimeRobotAlert.AlertTypes.Up)
+                {
+                    message = $"<b>{uptimeRobotAlert.FriendlyName}</b> is now <strong>{uptimeRobotAlert.AlertTypeFriendlyName.ToUpper()}</strong>\nDown for: <b>{uptimeRobotAlert.AlertDuration} seconds</b>\n";
+                }
+
+                message += (!string.IsNullOrEmpty(uptimeRobotAlert.Url)) ? $"Target: {uptimeRobotAlert.Url}\n" : "";
+                message += (!string.IsNullOrEmpty(uptimeRobotAlert.AlertDetails)) ? $"Details: {uptimeRobotAlert.AlertDetails}\n" : "";
+
+                var telegramRequest = new TelegramRequest(_telegramSettings.TelegramChannel, "HTML", message);
+                var telegramResponse = await _httpClient.PostAsync(new Uri($"{_telegramSettings.TelegramUrl}/bot{_telegramSettings.Token}/sendMessage"), new StringContent(JsonConvert.SerializeObject(telegramRequest), Encoding.UTF8, "application/json"));
+
+                return telegramResponse.IsSuccessStatusCode;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Got an exception while sending UptimeRobot alert to Twitter");
                 return false;
             }
         }
