@@ -18,6 +18,13 @@ namespace Pi.Dns.Function.Notifications.AlertClients
         Task<bool> TrySendHetrixToolsAlert(HetrixToolsAlert hetrixToolsAlert);
 
         /// <summary>
+        /// Try send uptime notification form uptime robot
+        /// </summary>
+        /// <param name="uptimeRobotAlert"></param>
+        /// <returns></returns>
+        Task<bool> TrySendUptimeRobotAlert(UptimeRobotAlert uptimeRobotAlert);
+
+        /// <summary>
         /// Try send pidns query statistics
         /// </summary>
         /// <param name="totalDnsRequests"></param>
