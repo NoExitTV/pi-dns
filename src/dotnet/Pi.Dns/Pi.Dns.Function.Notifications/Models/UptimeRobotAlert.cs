@@ -10,7 +10,7 @@ namespace Pi.Dns.Function.Notifications.Models
         public int AlertType { get; set; }
         public string AlertTypeFriendlyName { get; set; }
         public string AlertDetails { get; set; }
-        public int AlertDuration { get; set; }
+        public string AlertDuration { get; set; }
 
         public static class AlertTypes
         {
