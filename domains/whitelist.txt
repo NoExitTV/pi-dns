@@ -1,4 +1,7 @@
 pi-dns.com
+www.pi-dns.com
+statistics.pi-dns.com
+notifications.pi-dns.com
 centraleu.pi-dns.com
 dot.centraleu.pi-dns.com
 doh.centraleu.pi-dns.com
@@ -11,8 +14,16 @@ doh.westus.pi-dns.com
 eastus.pi-dns.com
 dot.eastus.pi-dns.com
 doh.eastus.pi-dns.com
+eastas.pi-dns.com
+doh.eastas.pi-dns.com
+dot.eastas.pi-dns.com
+eastau.pi-dns.com
+doh.eastau.pi-dns.com
+dot.eastau.pi-dns.com
 aboo.se
+www.aboo.se
 noexit.tv
+www.noexit.tv
 app.adjust.com
 assets.adobedtm.com
 s.amazon-adsystem.com
@@ -48,3 +59,5 @@ kuaidi100.com
 www.kuaidi100.com
 cdn.kuaidi100.com
 m.kuaidi100.com
+ivory.co.il
+www.ivory.co.il
